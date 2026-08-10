@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YANFIT // Official Collection</title>
+    <style>
+        /* --- ESTILOS GENERALES Y TOKENS DE DISEÑO --- */
+        :root {
+            --bg-color: #fff0f5;          
+            --surface-color: #ffe4e1;     
+            --accent-pink: #ff69b4;       
+            --text-dark: #4a2e35;         
+            --text-muted: #8c626d;        
+            --border-color: #ffccd5;      
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* ==========================================================================
+           PANTALLA DE CARGA (PRELOADER)
+           ========================================================================== */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .loader-logo {
+            width: 50px;
+            height: auto;
+            z-index: 10000;
+            filter: drop-shadow(0px 4px 15px rgba(255, 105, 180, 0.3));
+        }
+
+        .progress-bar-container {
+            width: 220px;
+            height: 2px;
+            background-color: var(--border-color);
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-pink);
+        }
+
+        /* --- CONTENEDORES PRINCIPALES --- */
+        section {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* ==========================================================================
+           HERO SECTION SIN VIDEO
+           ========================================================================== */
+        .hero {
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(255, 240, 245, 0.4) 0%, rgba(255, 240, 245, 0.8) 80%, var(--bg-color) 100%);
+            z-index: 1;
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            max-width: 90%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .club-logo {
+            position: absolute;
+            top: 20vh; 
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 50px;
+            width: 100%;
+            height: auto;
+            z-index: 1000;
+            filter: drop-shadow(0px 4px 15px rgba(255, 105, 180, 0.25));
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            line-height: 0.95;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            background: linear-gradient(180deg, var(--text-dark) 0%, var(--accent-pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: clamp(0.75rem, 2.5vw, 1rem);
+            letter-spacing: 5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 65px; 
+            margin-bottom: 12px;
+        }
+
+        .scroll-down {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 35px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(6px); }
+        }
+
+        /* --- SHOWCASE AREA --- */
+        .showcase {
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-window {
+            position: relative;
+            width: 65vh;
+            height: 65vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .shirt-img {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+            will-change: transform, opacity;
+            border-radius: 12px;
+        }
+
+        .shirt-img.frente {
+            opacity: 1;
+            transform: scale(0.9);
+        }
+
+        .text-layer {
+            position: absolute;
+            z-index: 3;
+            max-width: 320px;
+            opacity: 0;
+            transform: translateY(40px);
+            will-change: transform, opacity;
+        }
+
+        .text-layer h2 {
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+            color: var(--text-dark);
+        }
+
+        .text-layer p {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+        }
+
+        #text-frente-1 { left: 8%; top: 38%; opacity: 1; transform: translateY(0); }
+        #text-clasica  { right: 8%; top: 38%; }
+        #text-frente-2 { left: 8%; top: 38%; }
+        #text-metal    { right: 8%; top: 38%; }
+
+
+        /* --- SECCIÓN DE TIENDA FINAL --- */
+        .shop-section {
+            min-height: 100vh;
+            width: 100vw;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 80px 24px;
+            position: relative;
+        }
+
+        .shop-header {
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        .shop-header h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .shop-header p {
+            color: var(--accent-pink);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(280px, 350px));
+            gap: 30px;
+            width: 100%;
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.08);
+        }
+
+        .card-visual-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1.15;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .card-meta-top {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .prod-id { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; color: var(--text-muted); }
+
+        .card-img {
+            max-height: 95%;
+            max-width: 95%;
+            object-fit: contain;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+            border-radius: 6px;
+        }
+
+        .view-toggles {
+            position: absolute;
+            bottom: 16px;
+            display: flex;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 3px;
+            z-index: 10;
+        }
+
+        .toggle-btn {
+            background: none; border: none; color: var(--text-muted); font-size: 0.65rem; font-weight: 800;
+            letter-spacing: 1.5px; padding: 6px 12px; cursor: pointer; text-transform: uppercase; transition: all 0.2s ease;
+            border-radius: 15px;
+        }
+        .toggle-btn.active { background-color: var(--accent-pink); color: var(--white); }
+
+        .card-details {
+            padding-top: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px; display: flex; justify-content: space-between; align-items: baseline;
+        }
+        .card-details h3 { font-size: clamp(1rem, 2vw, 1.15rem); font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; color: var(--text-dark); }
+        .card-price { font-size: clamp(0.95rem, 1.8vw, 1.1rem); font-weight: 700; color: var(--accent-pink); letter-spacing: -0.5px; }
+
+        .size-selector-box { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+        .size-label { font-size: 0.7rem; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; }
+        .sizes-row { display: flex; gap: 8px; }
+
+        .size-btn {
+            background: var(--white); border: 1px solid var(--border-color); color: var(--text-dark); width: 36px; height: 36px;
+            border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;
+        }
+        .size-btn:hover { border-color: var(--accent-pink); }
+        .size-btn.active { background-color: var(--accent-pink); color: var(--white); border-color: var(--accent-pink); }
+
+        .btn-purchase {
+            margin-top: 20px; width: 100%; background-color: var(--accent-pink); color: var(--white); border: none; padding: 14px;
+            border-radius: 8px; font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-purchase:hover { background-color: #ff479b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255, 105, 180, 0.3); }
+
+        @media (max-width: 1024px) {
+            .shop-grid { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
+        }
+
+        @media (max-width: 768px) {
+            section { padding: 15px; }
+            .club-logo { top: 20vh; }
+            .showcase { flex-direction: column; justify-content: flex-start; padding-top: 8vh; }
+            .product-window { width: 100vw; height: 48vh; margin-bottom: 20px; }
+            .shirt-img { transform: scale(0.9); }
+            .shirt-img.frente { transform: scale(0.95); }
+            .text-layer { position: absolute; bottom: 8vh; left: 5% !important; right: 5% !important; top: auto !important; max-width: 90% !important; text-align: center; display: flex; flex-direction: column; align-items: center; }
+            .text-layer h2 { font-size: 1.8rem; margin-bottom: 8px; }
+            .text-layer p { font-size: 0.95rem; max-width: 400px; }
+            #text-frente-1 { opacity: 1; transform: translateY(0); }
+            #text-clasica  { opacity: 0; transform: translateY(40px); }
+            #text-frente-2 { opacity: 0; transform: translateY(40px); }
+            #text-metal    { opacity: 0; transform: translateY(40px); }
+            .shop-grid { grid-template-columns: 1fr; gap: 30px; padding: 0 10px; }
+            .shop-section { padding: 60px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loader" class="loader-container">
+        <div class="loader-content" id="loader-content-box">
+            <img src="logoo.png" alt="Cargando..." class="loader-logo" id="anim-logo" onerror="this.style.display='none'">
+            <div class="progress-bar-container" id="bar-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGO PRINCIPAL -->
+    <img src="logoo.png" alt="Yanfit Logo" class="club-logo" id="main-logo" onerror="this.style.display='none'">
+
+    <!-- 1. HERO / INTRODUCCIÓN -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <p class="tagline hero-anim-text">YANFIT</p>
+            <h1 class="hero-anim-text">ROPA<br>DEPORTIVA</h1>
+            <p class="scroll-down hero-anim-text">Desplaza para inspeccionar ↓</p>
+        </div>
+    </section>
+
+    <!-- 2. SHOWCASE INTERACTIVO (Reordenado: 4ta anterior ahora es 3ra, y nueva en 4ta) -->
+    <section class="showcase">
+        <div class="text-layer" id="text-frente-1">
+            <h2>COLECCIÓN LEGACY</h2>
+            <p>Energía al 100%. Diseño urbano y oversize para destacar en cada entrenamiento.</p>
+        </div>
+        <div class="text-layer" id="text-clasica">
+            <h2>EDICIÓN EXCLUSIVA</h2>
+            <p>Balance perfecto entre comodidad y fuerza. Rompe tus propios límites.</p>
+        </div>
+        <div class="text-layer" id="text-frente-2">
+            <h2>NUEVA SILUETA</h2>
+            <p>Active Blue Dress. Libertad de movimiento con un corte espectacular.</p>
+        </div>
+        <div class="text-layer" id="text-metal">
+            <h2>NUEVO ESTILO</h2>
+            <p>Agrega aquí la descripción de tu nueva prenda agregada en la cuarta posición.</p>
+        </div>
+
+        <div class="product-window">
+            <img src="legacy2.png" class="shirt-img frente" alt="GetFit Legacy">
+            <img src="legacy.png" class="shirt-img espalda-clasica" alt="Bi Color Bra">
+            <img src="lover.png" class="shirt-img espalda-metal" alt="Active Blue Dress">
+            <img src="you.png" class="shirt-img nueva-foto" alt="Nueva Prenda">
+        </div>
+    </section>
+
+    <!-- 3. SECCIÓN DE TIENDA FINAL -->
+    <div class="shop-section">
+        <div class="shop-header">
+            <p>EXPLORA EL CATÁLOGO</p>
+            <h2>EDICIONES LIMITADAS</h2>
+        </div>
+        <div class="shop-grid">
+            
+            <!-- PRODUCTO 1 -->
+            <div class="product-card" id="card-1">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°01</span></div>
+                    <img id="img-prod-1" src="PHOTO-2026-08-09-15-17-04(4).jpg" class="card-img" alt="GetFit Legacy Oversized">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(1, 'frente')">Detalle</button>
+                        <button class="toggle-btn" onclick="switchProductView(1, 'espalda')">Modelo</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>GetFit Legacy Oversized</h3><span class="card-price">$450 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                        <button class="size-btn" onclick="selectSize(1, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(1, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(1, 'L')">L</button>
+                        <button class="size-btn" onclick="selectSize(1, 'XL')">XL</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(1)">Pedir por WhatsApp</button>
+            </div>
+
+            <!-- PRODUCTO 2 -->
+            <div class="product-card" id="card-2">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°02</span></div>
+                    <img id="img-prod-2" src="PHOTO-2026-08-09-15-17-04.jpg" class="card-img" alt="You VS You T-Shirt">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(2, 'frente')">Colores</button>
+                        <button class="toggle-btn" onclick="switchProductView(2, 'espalda')">Espalda</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>You VS You T-Shirt</h3><span class="card-price">$450 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                        <button class="size-btn" onclick="selectSize(2, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(2, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(2, 'L')">L</button>
+                        <button class="size-btn" onclick="selectSize(2, 'XL')">XL</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(2)">Pedir por WhatsApp</button>
+            </div>
+
+            <!-- PRODUCTO 3 -->
+            <div class="product-card" id="card-3">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°03</span></div>
+                    <img id="img-prod-3" src="PHOTO-2026-08-09-15-17-04(1).jpg" class="card-img" alt="Bi-Color Bra Premium">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(3, 'frente')">Pink</button>
+                        <button class="toggle-btn" onclick="switchProductView(3, 'espalda')">Black</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>Bi-Color Bra Premium</h3><span class="card-price">$380 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                        <button class="size-btn" onclick="selectSize(3, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(3, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(3, 'L')">L</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(3)">Pedir por WhatsApp</button>
+            </div>
+
+            <!-- PRODUCTO 4 -->
+            <div class="product-card" id="card-4">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°04</span></div>
+                    <img id="img-prod-4" src="PHOTO-2026-08-09-15-17-40.jpg" class="card-img" alt="Active Blue Dress">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(4, 'frente')">Lookbook</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>Active Blue Dress</h3><span class="card-price">$550 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                         <button class="size-btn" onclick="selectSize(4, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(4, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(4, 'L')">L</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(4)">Pedir por WhatsApp</button>
+            </div>
+
+            <!-- PRODUCTO 5 -->
+            <div class="product-card" id="card-5">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°05</span></div>
+                    <img id="img-prod-5" src="PHOTO-2026-08-09-15-17-40(1).jpg" class="card-img" alt="Skater Active Skirt">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(5, 'frente')">Detalle</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>Skater Active Skirt</h3><span class="card-price">$350 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                        <button class="size-btn" onclick="selectSize(5, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(5, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(5, 'L')">L</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(5)">Pedir por WhatsApp</button>
+            </div>
+
+            <!-- PRODUCTO 6 -->
+            <div class="product-card" id="card-6">
+                <div class="card-visual-box">
+                    <div class="card-meta-top"><span class="prod-id">N°06</span></div>
+                    <img id="img-prod-6" src="PHOTO-2026-08-09-15-17-40(2).jpg" class="card-img" alt="Seamless Short & Bra Set">
+                    <div class="view-toggles">
+                        <button class="toggle-btn active" onclick="switchProductView(6, 'frente')">Colores</button>
+                    </div>
+                </div>
+                <div class="card-details">
+                    <h3>Seamless Short & Bra Set</h3><span class="card-price">$650 MXN</span>
+                </div>
+                <div class="size-selector-box">
+                    <span class="size-label">TALLA</span>
+                    <div class="sizes-row">
+                        <button class="size-btn" onclick="selectSize(6, 'S')">S</button>
+                        <button class="size-btn active" onclick="selectSize(6, 'M')">M</button>
+                        <button class="size-btn" onclick="selectSize(6, 'L')">L</button>
+                    </div>
+                </div>
+                <button class="btn-purchase" onclick="checkoutProduct(6)">Pedir por WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOTOR DE ANIMACIÓN Y LIBRERÍAS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    
+    <script>
+        let lenis;
+
+        const selectedSizes = { 1: "M", 2: "M", 3: "M", 4: "M", 5: "M", 6: "M" };
+        
+        const productImages = {
+            1: { frente: "legacy.png", espalda: "legacy2.png" },
+            2: { frente: "PHOTO-2026-08-09-15-17-04.jpg", espalda: "PHOTO-2026-08-09-15-17-04(2).jpg" },
+            3: { frente: "PHOTO-2026-08-09-15-17-04(1).jpg", espalda: "PHOTO-2026-08-09-15-17-05(2).jpg" },
+            4: { frente: "PHOTO-2026-08-09-15-17-40.jpg", espalda: "PHOTO-2026-08-09-15-17-40.jpg" },
+            5: { frente: "PHOTO-2026-08-09-15-17-40(1).jpg", espalda: "PHOTO-2026-08-09-15-17-40(1).jpg" },
+            6: { frente: "PHOTO-2026-08-09-15-17-40(2).jpg", espalda: "PHOTO-2026-08-09-15-17-40(2).jpg" }
+        };
+
+        const productNames = {
+            1: "GetFit Legacy Oversized",
+            2: "You VS You T-Shirt",
+            3: "Bi-Color Bra Premium",
+            4: "Active Blue Dress",
+            5: "Skater Active Skirt",
+            6: "Seamless Short & Bra Set"
+        };
+
+        function switchProductView(productId, view) {
+            const card = document.getElementById(`card-${productId}`);
+            const imgElement = document.getElementById(`img-prod-${productId}`);
+            const buttons = card.querySelectorAll('.toggle-btn');
+            
+            buttons.forEach(btn => {
+                if (btn.onclick.toString().includes(view)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            imgElement.style.opacity = '0';
+            imgElement.style.transform = 'scale(0.9)';
+            
+            setTimeout(() => {
+                imgElement.src = productImages[productId][view];
+                imgElement.style.opacity = '1';
+                imgElement.style.transform = 'scale(1)';
+            }, 250);
+        }
+
+        function selectSize(productId, size) {
+            selectedSizes[productId] = size;
+            const card = document.getElementById(`card-${productId}`);
+            card.querySelectorAll('.size-btn').forEach(btn => btn.textContent === size ? btn.classList.add('active') : btn.classList.remove('active'));
+        }
+
+        function checkoutProduct(productId) {
+            const productName = productNames[productId];
+            const size = selectedSizes[productId];
+            const encodedMessage = encodeURIComponent(`¡Hola Yanfit! Me interesa adquirir el producto ${productName} en Talla ${size}. ¿Tienen disponibilidad en stock? 💕`);
+            window.open(`https://wa.me/5211234567890?text=${encodedMessage}`, '_blank');
+        }
+
+        window.addEventListener('load', () => {
+            const animLogo = document.getElementById('anim-logo');
+            const mainLogo = document.getElementById('main-logo');
+            const loaderBg = document.getElementById('loader');
+            const heroTexts = document.querySelectorAll('.hero-anim-text');
+            
+            gsap.set(heroTexts, { opacity: 0, y: 30 });
+            gsap.set(mainLogo, { opacity: 0 });
+
+            const loadTl = gsap.timeline({
+                onComplete: () => {
+                    loaderBg.style.display = 'none';
+                    gsap.set(mainLogo, { opacity: 1 });
+                    animLogo.style.display = 'none';
+                    if (lenis) lenis.start(); 
+                }
+            });
+
+            loadTl.to("#progress-bar", {
+                width: "100%",
+                duration: 1.2,
+                ease: "expo.inOut"
+            })
+            .to("#bar-container", {
+                opacity: 0,
+                duration: 0.3
+            });
+
+            loadTl.add(() => {
+                const startRect = animLogo.getBoundingClientRect();
+                const targetRect = mainLogo.getBoundingClientRect();
+                
+                gsap.set(animLogo, {
+                    position: 'fixed',
+                    left: startRect.left,
+                    top: startRect.top,
+                    width: startRect.width,
+                    height: startRect.height,
+                    margin: 0
+                });
+
+                gsap.to(animLogo, {
+                    left: targetRect.left,
+                    top: targetRect.top,
+                    width: targetRect.width,
+                    height: targetRect.height,
+                    rotation: 0, 
+                    duration: 1.2,
+                    ease: "power3.inOut"
+                });
+            });
+
+            loadTl.to(loaderBg, {
+                backgroundColor: "rgba(255, 240, 245, 0)",
+                duration: 1
+            }, "+=0.2")
+            
+            .to(heroTexts, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                stagger: 0.2, 
+                ease: "power2.out"
+            }, "-=0.6");
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), gestureOrientation: 'vertical', smoothWheel: true, touchMultiplier: 1.5 });
+            lenis.stop(); 
+            
+            function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+            requestAnimationFrame(raf);
+            
+            gsap.registerPlugin(ScrollTrigger);
+
+            let isMobile = window.innerWidth <= 768;
+            window.addEventListener('resize', () => isMobile = window.innerWidth <= 768);
+
+            const tl = gsap.timeline({
+                scrollTrigger: { trigger: ".showcase", start: "top top", end: "+=4500", scrub: 1.2, pin: true, invalidateOnRefresh: true }
+            });
+
+            tl.to(".frente", { scale: isMobile ? 1.02 : 1.1 }, "fase1")
+              .to("#text-frente-1", { opacity: 0, y: isMobile ? 30 : -40 }, "fase1")
+              .to(".frente", { opacity: 0 }, "fase2")
+              .to(".espalda-clasica", { opacity: 1, scale: isMobile ? 0.95 : 1.05 }, "fase2")
+              .to("#text-clasica", { opacity: 1, y: 0 }, "fase2+=0.2")
+              .to({}, { duration: 0.5 })
+              .to("#text-clasica", { opacity: 0, y: isMobile ? 30 : -40 })
+              .to(".espalda-clasica", { opacity: 0 }, "fase3")
+              .to(".espalda-metal", { opacity: 1, scale: isMobile ? 0.95 : 1.05 }, "fase3")
+              .to("#text-frente-2", { opacity: 1, y: 0 }, "fase3+=0.2")
+              .to({}, { duration: 0.5 })
+              .to("#text-frente-2", { opacity: 0, y: isMobile ? 30 : -40 })
+              .to(".espalda-metal", { opacity: 0 }, "fase4")
+              .to(".nueva-foto", { opacity: 1, scale: isMobile ? 0.95 : 1.05 }, "fase4")
+              .to("#text-metal", { opacity: 1, y: 0 }, "fase4+=0.2");
+        });
+    </script>
+</body>
+</html>
