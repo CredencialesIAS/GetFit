@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Sincroniza el contador del carrito al cargar la vista de producto
+    if (typeof updateCartUI === 'function') {
+        updateCartUI();
+    }
+
     const params = new URLSearchParams(window.location.search);
     
     // Parámetros obtenidos de la URL
@@ -76,9 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Parámetros sincronizados con script.js: (id, name, price, size, img)
                 addToCart(id, fullTitle, numericPrice, selectedSize, img);
                 
-                // Abre la ventana lateral del carrito
+                // Forzar el almacenamiento inmediato en localStorage
+                if (typeof saveCart === 'function') {
+                    saveCart();
+                }
+                
+                // Abre la ventana lateral del carrito forzando la apertura
                 if (typeof toggleCart === 'function') {
-                    toggleCart();
+                    toggleCart(true);
                 }
             } else {
                 console.error('La función addToCart no está disponible. Revisa script.js');

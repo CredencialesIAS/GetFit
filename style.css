@@ -30,6 +30,11 @@ body {
     width: 100%;
 }
 
+section {
+    width: 100%;
+    position: relative;
+}
+
 
 /* ================================
    HEADER Y NAVEGACIÓN
@@ -140,8 +145,9 @@ body {
     height: 60px;
     width: auto;
     object-fit: contain;
-    opacity: 0;
-    transform: translateY(10px);
+    /* Eliminadas transiciones automáticas para que GSAP tenga el control absoluto sin parpadeos */
+    opacity: 1;
+    transform: none;
 }
 
 .progress-bar-container {
@@ -161,11 +167,6 @@ body {
 /* ================================
    HERO Y SECCIONES
 ================================ */
-section {
-    width: 100%;
-    position: relative;
-}
-
 .hero {
     height: 100vh;
     display: flex;
@@ -328,7 +329,7 @@ section {
 
 
 /* ================================
-   CATÁLOGO Y TARJETAS (ESTABILIZADO)
+   CATÁLOGOS Y TARJETAS
 ================================ */
 .shop-section {
     height: auto !important;
@@ -361,7 +362,6 @@ section {
     color: var(--black);
 }
 
-/* Grilla simétrica de 3 columnas */
 .shop-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -469,19 +469,22 @@ section {
     width: 100%;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    z-index: 10000;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1500;
     display: flex;
     justify-content: center;
     align-items: center;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-overlay.active {
     opacity: 1;
-    pointer-events: all;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .modal-content {
@@ -493,12 +496,19 @@ section {
     overflow: hidden;
     padding: 32px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
 }
 
-.modal-overlay.active .modal-content {
-    transform: translateY(0);
+.modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+    transform: scale(0.92) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-body {
+    transform: scale(1) translateY(0);
 }
 
 .modal-close {
@@ -511,13 +521,6 @@ section {
     cursor: pointer;
     color: var(--black);
     z-index: 10;
-}
-
-.modal-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    align-items: center;
 }
 
 .main-img-box {
@@ -656,23 +659,26 @@ section {
 
 
 /* ================================
-   PANEL LATERAL DEL CARRITO (UNIFICADO)
+   PANEL LATERAL DEL CARRITO (DRAWER)
 ================================ */
 .cart-drawer {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100vh;
-    z-index: 10000;
-    visibility: hidden;
+    height: 100%;
+    z-index: 2000;
     opacity: 0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .cart-drawer.active {
-    visibility: visible;
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .cart-overlay {
@@ -680,7 +686,9 @@ section {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.4s ease;
 }
 
 .cart-content {
@@ -694,11 +702,11 @@ section {
     border-left: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    padding: 28px;
+    padding: 30px;
     box-sizing: border-box;
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
 }
 
 .cart-drawer.active .cart-content {
@@ -736,7 +744,6 @@ section {
     opacity: 0.5;
 }
 
-/* LISTA DE ÍTEMS EN EL CARRITO */
 .cart-items-list {
     flex: 1;
     overflow-y: auto;
@@ -749,11 +756,22 @@ section {
 .cart-item {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 15px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
     background: var(--surface-color);
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    animation: cartItemSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cartItemSlide {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .cart-item-img {
@@ -873,7 +891,7 @@ section {
 
 
 /* ================================
-   DISEÑO RESPONSIVO (MOBILE/TABLET)
+   DISEÑO RESPONSIVO (MEDIA QUERIES)
 ================================ */
 @media (max-width: 1024px) {
     .shop-grid {
@@ -952,112 +970,120 @@ section {
     }
 }
 /* ================================
-   TRANSICIONES Y FLUIDEZ (SMOOTH UI)
+   AJUSTES DE CENTRADO PARA CELULAR
 ================================ */
-
-/* Cart Drawer suave */
-.cart-drawer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2000;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                visibility 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cart-drawer.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-.cart-overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    transition: opacity 0.4s ease;
-}
-
-.cart-content {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 100%;
-    max-width: 420px;
-    height: 100%;
-    background: var(--white);
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transform: translateX(100%);
-    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
-}
-
-.cart-drawer.active .cart-content {
-    transform: translateX(0);
-}
-
-/* Animación de entrada para los productos del carrito */
-.cart-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border-color);
-    animation: cartItemSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes cartItemSlide {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
+@media (max-width: 768px) {
+    /* Centrar alineaciones globales del contenedor principal y textos */
+    body {
+        text-align: center;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    /* Alinear contenido del header y menú lateral si aplica */
+    .top-header {
+        justify-content: space-between;
+        padding: 0 16px;
     }
-}
 
-/* Modal suave */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(6px);
-    z-index: 1500;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .header-logo {
+        left: 50%;
+        transform: translateX(-50%);
+    }
 
-.modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
+    .cart-btn {
+        right: 16px;
+    }
 
-.modal-body {
-    transform: scale(0.92) translateY(20px);
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
+    /* Centrar sección Hero completa */
+    .hero {
+        padding-top: 100px;
+        text-align: center;
+    }
 
-.modal-overlay.active .modal-body {
-    transform: scale(1) translateY(0);
+    .hero-content {
+        align-items: center;
+        text-align: center;
+        max-width: 100%;
+        padding: 0 16px;
+    }
+
+    .hero-logo, .club-logo {
+        left: 0;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Centrar elementos de la sección Showcase interactivo */
+    .showcase {
+        align-items: center;
+        text-align: center;
+    }
+
+    .product-window {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .text-layer {
+        left: 50% !important;
+        transform: translateX(-50%) translateY(0) !important;
+        text-align: center;
+        align-items: center;
+        width: 90%;
+    }
+
+    /* Centrar cabeceras y tarjetas de la tienda */
+    .shop-section {
+        padding: 90px 16px 60px 16px;
+        text-align: center;
+    }
+
+    .shop-header {
+        text-align: center;
+    }
+
+    .shop-grid {
+        justify-items: center;
+    }
+
+    .product-card,
+    .product-item,
+    .product-item-wide {
+        align-items: center;
+        text-align: center;
+    }
+
+    .card-info-minimal,
+    .product-info-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        text-align: center;
+    }
+
+    .product-titles {
+        align-items: center;
+    }
+
+    /* Centrar contenido dentro del Modal de producto */
+    .modal-body {
+        text-align: center;
+        justify-items: center;
+    }
+
+    .modal-thumbs {
+        justify-content: center;
+    }
+
+    .sizes-row {
+        justify-content: center;
+    }
+
+    .modal-info {
+        text-align: center;
+    }
+
+    /* Centrar selectores de cantidad en el Carrito */
+    .cart-item {
+        text-align: left; /* Mantiene la estructura interna legible, pero puedes cambiarlo a center si prefieres */
+    }
 }

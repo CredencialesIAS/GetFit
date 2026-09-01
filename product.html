@@ -587,7 +587,16 @@
     <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
 
     <!-- Scripts de la tienda (en este orden estricto) -->
+   <!-- Scripts de la tienda (en este orden estricto) -->
     <script src="script.js"></script>
     <script src="product.js"></script>
+    <script>
+        // Sincroniza el contador del carrito al regresar a esta vista
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof updateCartUI === 'function') {
+                updateCartUI();
+            }
+        });
+    </script>
 </body>
 </html>

@@ -3,9 +3,17 @@
 ================================ */
 const WHATSAPP_PHONE = "5211234567890";
 let lenis;
+let cart = [];
 
-// Cargar carrito guardado en localStorage para persistencia entre páginas
-let cart = JSON.parse(localStorage.getItem('yanfit_cart')) || [];
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Cargar el carrito guardado
+    cart = JSON.parse(localStorage.getItem('yanfit_cart')) || [];
+    
+    // 2. Pintar la interfaz del carrito inmediatamente en cualquier vista
+    if (typeof updateCartUI === 'function') {
+        updateCartUI();
+    }
+});
 
 // Estado del producto abierto en el Modal
 let activeModalProduct = {
@@ -384,6 +392,7 @@ window.addEventListener("load", () => {
     const loaderBg = document.getElementById("loader");
     const heroTexts = document.querySelectorAll(".hero-anim-text");
 
+    // Ya no manipulamos la opacidad del logo para que esté estático desde el inicio y solo viaje.
     gsap.set(heroTexts, { opacity: 0, y: 30 });
 
     const loadTl = gsap.timeline({
@@ -394,9 +403,8 @@ window.addEventListener("load", () => {
     });
 
     loadTl
-        .to(".loader-logo", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" })
         .to("#progress-bar", { width: "100%", duration: 1.2, ease: "power2.inOut" })
-        .to("#bar-container", { opacity: 0, duration: 0.3 })
+        .to(".progress-bar-container", { opacity: 0, duration: 0.3 })
         .to(loaderBg, { opacity: 0, duration: 0.8, ease: "power3.inOut" })
         .to(".loader-logo", { y: "-12vh", scale: 0.9, duration: 0.8, ease: "power3.inOut" }, "<")
         .to(heroTexts, { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: "power3.out" }, "-=0.3");
